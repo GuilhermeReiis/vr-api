@@ -20,5 +20,5 @@ export class ProductEntity {
   image: string;
 
   @DeleteDateColumn({ name: 'deleted_at', nullable: true })
-  deletedAt: Date; // Coluna para rastrear a data de exclusão lógica
+  deletedAt: Date;
 }

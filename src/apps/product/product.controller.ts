@@ -28,11 +28,6 @@ export class ProductController {
     return await this.productService.deleteById(id);
   }
 
-  // @Get('')
-  // async findAll() {
-  //   return await this.productService.findAll();
-  // }
-
   @Get()
   async findAll(
     @Query('page', ParseIntPipe) page,
@@ -42,14 +37,7 @@ export class ProductController {
     @Query('amount') amount?: number,
     @Query('amountPrice') amountPrice?: number,
   ) {
-    return this.productService.findAll(
-      page,
-      limit,
-      id,
-      description,
-      amount,
-      amountPrice,
-    );
+    return this.productService.findAll(page, limit, id, description, amount);
   }
 
   @Get(':id')

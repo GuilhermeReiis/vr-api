@@ -36,17 +36,12 @@ export class ProductService {
     return await this.productRepository.softDelete(parseInt(id));
   }
 
-  // async findAll() {
-  //   return await this.productRepository.find();
-  // }
-
   async findAll(
     page: number,
     limit: number,
     id?: string,
     description?: string,
     amount?: number,
-    amountPrice?: number,
   ) {
     const skip = (page - 1) * limit;
     const where: any = {};
@@ -55,7 +50,6 @@ export class ProductService {
     if (description)
       Object.assign(where, { description: ILike(`${description}%`) });
     if (amount) Object.assign(where, { amount });
-    // if (amountPrice) where.productStore = { amount: amountPrice };
 
     const [items, total] = await this.productRepository.findAndCount({
       where,

@@ -9,7 +9,6 @@ import {
 } from '@nestjs/common';
 import { SaveProductStoreDto } from './interface/save-product-store.dto';
 import { ProductStoreService } from './product-store.service';
-import { ProductStoreEntity } from './entity/product-store.entity';
 
 @Controller('product-store')
 export class ProductStoreController {

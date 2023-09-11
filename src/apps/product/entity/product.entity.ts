@@ -13,7 +13,7 @@ export class ProductEntity {
   @Column({ name: 'description', length: 500, nullable: false })
   description: string;
 
-  @Column({ name: 'amount', nullable: false })
+  @Column({ name: 'amount', nullable: false, type: 'float' })
   amount: number;
 
   @Column({ name: 'image', nullable: true })

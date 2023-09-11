@@ -20,7 +20,7 @@ export class ProductStoreEntity {
   @Column({ name: '_storeId', nullable: false })
   _storeId: number;
 
-  @Column({ name: 'amount', nullable: true, default: '0' })
+  @Column({ name: 'amount', nullable: true, default: '0', type: 'float' })
   amount: number;
 
   @ManyToOne(() => ProductEntity)

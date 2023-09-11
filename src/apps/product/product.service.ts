@@ -1,14 +1,17 @@
 import { Injectable, NotFoundException } from '@nestjs/common';
-import { Repository } from 'typeorm';
+import { Repository, Like, ILike } from 'typeorm';
 import { ProductEntity } from './entity/product.entity';
 import { InjectRepository } from '@nestjs/typeorm';
 import { SaveProductDto } from './interface/save-product.dto';
+import { ProductStoreEntity } from '../product-store/entity/product-store.entity';
 
 @Injectable()
 export class ProductService {
   constructor(
     @InjectRepository(ProductEntity)
     private readonly productRepository: Repository<ProductEntity>,
+    @InjectRepository(ProductStoreEntity)
+    private readonly productStoreRepository: Repository<ProductStoreEntity>,
   ) {}
 
   async findOneOrFail(id: string) {
@@ -28,11 +31,41 @@ export class ProductService {
   async deleteById(id: string) {
     const product = await this.productRepository.findOneById(id);
     if (!product) throw new NotFoundException('Produto não encontrado');
+
+    await this.productStoreRepository.softDelete({ _productId: parseInt(id) });
     return await this.productRepository.softDelete(parseInt(id));
   }
 
-  async findAll() {
-    return await this.productRepository.find();
+  // async findAll() {
+  //   return await this.productRepository.find();
+  // }
+
+  async findAll(
+    page: number,
+    limit: number,
+    id?: string,
+    description?: string,
+    amount?: number,
+    amountPrice?: number,
+  ) {
+    const skip = (page - 1) * limit;
+    const where: any = {};
+
+    if (id) Object.assign(where, { id: parseInt(id) });
+    if (description)
+      Object.assign(where, { description: ILike(`${description}%`) });
+    if (amount) Object.assign(where, { amount });
+    // if (amountPrice) where.productStore = { amount: amountPrice };
+
+    const [items, total] = await this.productRepository.findAndCount({
+      where,
+      skip,
+      take: limit,
+    });
+
+    const totalPages = Math.ceil(total / limit);
+
+    return { items, total, page, limit, totalPages };
   }
 
   async findById(id: string) {

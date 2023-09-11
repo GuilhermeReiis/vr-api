@@ -7,10 +7,8 @@ import { InjectRepository } from '@nestjs/typeorm';
 import { ProductStoreEntity } from './entity/product-store.entity';
 import { Repository } from 'typeorm';
 import { SaveProductStoreDto } from './interface/save-product-store.dto';
-import { StoreService } from '../store/store.service';
 import { SaveStoreDto } from '../store/interface/save-store.dto';
 import { StoreEntity } from '../store/entity/store.entity';
-import { parse } from 'path';
 
 @Injectable()
 export class ProductStoreService {
@@ -65,22 +63,27 @@ export class ProductStoreService {
   }
 
   async update(id: string, data: any) {
-    const StoreId = data._storeId;
+    const productStore = await this.productStoreRepository.findOneById(
+      parseInt(id),
+    );
+    if (!productStore) throw new NotFoundException('Produto não encontrado');
 
-    delete data._productId;
-    const product = await this.productStoreRepository.findOneById(parseInt(id));
+    const store = await this.storeRepository.findOneById(
+      parseInt(data._storeId),
+    );
+    if (!store) throw new NotFoundException('Loja não encontrada');
 
-    delete product._productId;
-    const store = await this.storeRepository.findOneById(parseInt(StoreId));
-    delete product._storeId;
-
-    this.productStoreRepository.merge(product, data);
+    this.productStoreRepository.merge(productStore, data);
     this.storeRepository.merge(store, { description: data.store });
 
-    await this.storeRepository.save(store);
+    const saveStore = await this.storeRepository.save(store);
+    if (!saveStore) throw new BadRequestException('Erro ao atualizar loja');
 
-    await this.productStoreRepository.save(product);
-
-    return;
+    return this.productStoreRepository.save({
+      amount: data.amount,
+      _storeId: saveStore.id,
+      _productId: productStore._productId,
+      id: productStore.id,
+    });
   }
 }

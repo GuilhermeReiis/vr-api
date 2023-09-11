@@ -4,9 +4,11 @@ import {
   Delete,
   Get,
   Param,
+  ParseIntPipe,
   ParseUUIDPipe,
   Post,
   Put,
+  Query,
 } from '@nestjs/common';
 import { ProductService } from './product.service';
 import { ProductEntity } from './entity/product.entity';
@@ -26,9 +28,28 @@ export class ProductController {
     return await this.productService.deleteById(id);
   }
 
-  @Get('')
-  async findAll() {
-    return await this.productService.findAll();
+  // @Get('')
+  // async findAll() {
+  //   return await this.productService.findAll();
+  // }
+
+  @Get()
+  async findAll(
+    @Query('page', ParseIntPipe) page,
+    @Query('limit', ParseIntPipe) limit,
+    @Query('id') id?: string,
+    @Query('description') description?: string,
+    @Query('amount') amount?: number,
+    @Query('amountPrice') amountPrice?: number,
+  ) {
+    return this.productService.findAll(
+      page,
+      limit,
+      id,
+      description,
+      amount,
+      amountPrice,
+    );
   }
 
   @Get(':id')
